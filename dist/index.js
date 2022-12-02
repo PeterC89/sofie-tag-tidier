@@ -38,7 +38,6 @@ function getTags() {
             "--format='%(creatordate:short):%(refname:short)'"
         ], options);
         (0, core_1.debug)(`stdout: ${os_1.EOL}${stdout.join()}`);
-        console.log(stdout.join().split(os_1.EOL).filter(l => !!l.trim()));
         return stdout
             .join()
             .split(os_1.EOL)
@@ -78,7 +77,11 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const result = yield (0, gettags_1.getTags)();
-            (0, core_1.info)(JSON.stringify(result));
+            const olderThanDate = new Date();
+            olderThanDate.setMonth(olderThanDate.getMonth() - 6);
+            const tagsToDelete = result.filter(t => t.date < olderThanDate.valueOf());
+            for (const tag of tagsToDelete)
+                (0, core_1.info)(`Going to delete: ${tag.name}`);
         }
         catch (error) {
             if (error instanceof Error)
