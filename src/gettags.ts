@@ -6,6 +6,7 @@ export async function getTags(): Promise<GitTag[]> {
   const stdout: string[] = []
 
   const options: ExecOptions = {
+    silent: true,
     listeners: {
       stdout: (data: Buffer) => {
         stdout.push(data.toString())
@@ -26,13 +27,17 @@ export async function getTags(): Promise<GitTag[]> {
 
   debug(`stdout: ${EOL}${stdout.join()}`)
 
-  return stdout.map(l => {
-    const d = l.split(':')
-    return {
-      date: Date.parse(d[0]),
-      name: d[1]
-    }
-  })
+  return stdout
+    .join()
+    .split(EOL)
+    .filter(l => !!l.trim())
+    .map(l => {
+      const d = l.trim().split(':')
+      return {
+        date: Date.parse(d[0]),
+        name: d[1]
+      }
+    })
 }
 
 interface GitTag {
