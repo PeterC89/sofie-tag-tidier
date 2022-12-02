@@ -1,5 +1,6 @@
-import {info} from '@actions/core'
+import {debug} from '@actions/core'
 import {exec, ExecOptions} from '@actions/exec'
+import {EOL} from 'os'
 
 export async function getTags(): Promise<GitTag[]> {
   const stdout: string[] = []
@@ -23,11 +24,18 @@ export async function getTags(): Promise<GitTag[]> {
     options
   )
 
-  info(stdout.join())
-  return []
+  debug(`stdout: ${EOL}${stdout.join()}`)
+
+  return stdout.map(l => {
+    const d = l.split(':')
+    return {
+      date: Date.parse(d[0]),
+      name: d[1]
+    }
+  })
 }
 
 interface GitTag {
-  date: Date
+  date: number
   name: string
 }
