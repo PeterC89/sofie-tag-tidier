@@ -19,6 +19,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getTags = void 0;
 const core_1 = __nccwpck_require__(186);
 const exec_1 = __nccwpck_require__(514);
+const os_1 = __nccwpck_require__(37);
 function getTags() {
     return __awaiter(this, void 0, void 0, function* () {
         const stdout = [];
@@ -35,8 +36,14 @@ function getTags() {
             '--sort=-creatordate',
             "--format='%(creatordate:short):%(refname:short)'"
         ], options);
-        (0, core_1.info)(stdout.join());
-        return [];
+        (0, core_1.debug)(`stdout: ${os_1.EOL}${stdout.join()}`);
+        return stdout.map(l => {
+            const d = l.split(':');
+            return {
+                date: Date.parse(d[0]),
+                name: d[1]
+            };
+        });
     });
 }
 exports.getTags = getTags;
@@ -49,29 +56,6 @@ exports.getTags = getTags;
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -82,18 +66,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(186));
+const core_1 = __nccwpck_require__(186);
 const gettags_1 = __nccwpck_require__(234);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.debug(new Date().toTimeString());
-            yield (0, gettags_1.getTags)();
-            core.debug(new Date().toTimeString());
+            const result = yield (0, gettags_1.getTags)();
+            (0, core_1.info)(JSON.stringify(result));
         }
         catch (error) {
             if (error instanceof Error)
-                core.setFailed(error.message);
+                (0, core_1.setFailed)(error.message);
         }
     });
 }
