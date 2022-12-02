@@ -24,6 +24,7 @@ function getTags() {
     return __awaiter(this, void 0, void 0, function* () {
         const stdout = [];
         const options = {
+            silent: true,
             listeners: {
                 stdout: (data) => {
                     stdout.push(data.toString());
@@ -37,8 +38,13 @@ function getTags() {
             "--format='%(creatordate:short):%(refname:short)'"
         ], options);
         (0, core_1.debug)(`stdout: ${os_1.EOL}${stdout.join()}`);
-        return stdout.map(l => {
-            const d = l.split(':');
+        console.log(stdout.join().split(os_1.EOL).filter(l => !!l.trim()));
+        return stdout
+            .join()
+            .split(os_1.EOL)
+            .filter(l => !!l.trim())
+            .map(l => {
+            const d = l.trim().split(':');
             return {
                 date: Date.parse(d[0]),
                 name: d[1]
